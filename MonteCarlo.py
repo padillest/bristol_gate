@@ -42,21 +42,6 @@ class MonteCarlo:
         """
         s_list = list(itertools.repeat(float(s), len(l)))
         return dict(zip(l, s_list))
-    
-    def generate_random_value(self, mean: float, 
-                              std: float, decimal: int) -> None: 
-        """
-        Returns a random value according to a 
-        Normal distribution, mean, and standard
-        deviation.
-        """
-        generated_val = float(np.random.normal(
-            loc=mean,
-            scale=std,
-            size=1
-        ).round(decimal))
-
-        return generated_val
 
     def generate_random_dict(self, generated_val: float) -> None:
         """
@@ -77,7 +62,7 @@ class MonteCarlo:
         """
         self.generated_ebitda_margin = round(float(self.sampled_data['ebitda_margin']), 3) # should be changed depending on dataset
         self.generated_projected_growth = float(self.sampled_data['projected_revenue']) #self.generate_random_value(mean=0.5, std=0.2, decimal=3)
-        self.generated_terminal_value_multiple = self.generate_random_value(mean=6, std=3, decimal=0)
+        self.generated_terminal_value_multiple = round(float(self.sampled_data['ev/ebitda']), 3) #self.generate_random_value(mean=6, std=3, decimal=0)
 
         self.ebitda_margin_dict = self.generate_random_dict(generated_val=self.generated_ebitda_margin)
         self.projected_growth_dict = self.generate_random_dict(generated_val=self.generated_projected_growth)

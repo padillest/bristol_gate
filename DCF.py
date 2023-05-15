@@ -1,4 +1,4 @@
-from wacc import WeightedAvgCostCapital
+from WACC import WeightedAvgCostCapital
 
 class DCF:
     def __init__(self, 
