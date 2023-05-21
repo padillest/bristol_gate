@@ -9,6 +9,11 @@ class MonteCarlo:
         self.n = n
         self.inputs = inputs
         self.ticker = ticker.upper()
+        self.simulated_dcfs = pd.DataFrame(columns=['projected_revenue', 'ebitda', 'dna',
+                                                        'ebit', 'tax', 'capex', 'net_working_capital',
+                                                        'unlevered_free_cash_flow', 'discount_factor', 'pv_ufcf'])
+        
+        self.simulated_exit_multiple_method = pd.DataFrame(columns=[])
 
         # Ingest and process data
         self.data = pd.read_excel(data)
@@ -43,32 +48,17 @@ class MonteCarlo:
         s_list = list(itertools.repeat(float(s), len(l)))
         return dict(zip(l, s_list))
 
-    def generate_random_dict(self, generated_val: float) -> None:
-        """
-        Returns an updated dictionary of 
-        inputs according to a simulated
-        value.
-        """
-        generated_dict = self.zip_scalar(
-            l=self.inputs['yrs'],
-            s=generated_val
-        )
-        return generated_dict
-
     def update_inputs(self):
         """
         Updates the inputs to include the simulated 
         values.
         """
-        self.generated_ebitda_margin = round(float(self.sampled_data['ebitda_margin']), 3) # should be changed depending on dataset
-        self.generated_projected_growth = float(self.sampled_data['projected_revenue']) #self.generate_random_value(mean=0.5, std=0.2, decimal=3)
-        self.generated_terminal_value_multiple = round(float(self.sampled_data['ev/ebitda']), 3) #self.generate_random_value(mean=6, std=3, decimal=0)
+        self.generated_ebitda_margin = self.sampled_data.iloc[0]['ebitda_margin']
+        self.generated_projected_growth = self.sampled_data['projected_revenue'].values
+        self.generated_terminal_value_multiple = self.sampled_data['ev/ebitda'].values
 
-        self.ebitda_margin_dict = self.generate_random_dict(generated_val=self.generated_ebitda_margin)
-        self.projected_growth_dict = self.generate_random_dict(generated_val=self.generated_projected_growth)
-
-        self.inputs.update(ebitda_margin=self.ebitda_margin_dict)
-        self.inputs.update(yr_growth=self.projected_growth_dict)
+        self.inputs.update(ebitda_margin=self.generated_ebitda_margin)
+        self.inputs.update(yr_growth=self.generated_projected_growth)
         self.inputs.update(exit_multiple=self.generated_terminal_value_multiple)
     
     def run_single_simulation(self):
@@ -90,16 +80,14 @@ class MonteCarlo:
             self.simulated_ebitda_margins.append(self.generated_ebitda_margin)
             self.simulated_terminal_value_multiples.append(self.generated_terminal_value_multiple)
             model = DCF.DCF(self.inputs)
-            self.simulated_share_price.append(model.implied_share_price)
+            # self.simulated_share_price.append(model.implied_share_price)
+            self.simulated_dcfs = pd.concat([self.simulated_dcfs, model.dcf_df])
+            self.simulated_exit_multiple_method = pd.concat([self.simulated_exit_multiple_method, model.exit_multiple_method_df])
 
-        return round(sum(self.simulated_share_price) / self.n, 2)
-
-
-
+            
     
-# Testing 
-
-"""inputs = {
+"""# Testing 
+inputs = {
     'business_risk_analysis': 'low',
     'financial_risk_analysis': 'low',
     'risk_free_rate': 0.0396,
@@ -115,11 +103,12 @@ class MonteCarlo:
     'previous_yr_revenue': 2200,
     #'yr_growth': {2024: 0.02, 2025: 0.02, 2026: 0.02}, 
     #'ebitda_margin': {2024: 0.05, 2025: 0.05, 2026: 0.05},
-    'dna': {2024: 0.034, 2025: 0.034, 2026: 0.034}, 
-    'tax_percent': {2024: 0.14, 2025: 0.14, 2026: 0.14},
-    'capex_percent': {2024: 0.04, 2025: 0.04, 2026: 0.04},
-    'nwc_percent': {2024: 0.01, 2025: 0.01, 2026: 0.01}
+    'dna': 0.034, 
+    'tax_percent': 0.14,
+    'capex_percent': 0.04,
+    'nwc_percent': 0.01
 }
 
 test = MonteCarlo(n=5, inputs=inputs, data='./dcf_data.xlsx')
-print(test.simulated_share_price)"""
+print(test.simulated_dcfs.round(3))
+print(test.simulated_exit_multiple_method)"""
