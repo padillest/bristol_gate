@@ -113,7 +113,7 @@ class DCF:
 
         for idx in self.dcf_df.index: 
             val = (1 / (1 + self.inputs['wacc']) ** (idx + 1))
-            self.dcf_df['discount_factor'] = val
+            self.dcf_df.at[idx, 'discount_factor'] = val
 
 
     def compute_present_value_ufcf(self):
@@ -189,7 +189,7 @@ class DCF:
 
 # Test
 
-"""inputs = {
+inputs = {
     'business_risk_analysis': 'low',
     'financial_risk_analysis': 'low',
     'risk_free_rate': 0.02,
@@ -214,7 +214,7 @@ class DCF:
 
 test = DCF(inputs=inputs)
 print(test.dcf_df)
-print(test.exit_multiple_method_df)"""
+print(test.exit_multiple_method_df)
 
 
     
