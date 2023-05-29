@@ -67,8 +67,7 @@ class UserInputs:
             self.yrs = st.slider(label='Specify the number of years:',
                             min_value=1,
                             max_value=10)
-            self.financial_risk = st.radio(label='Select the Financial Risk:',
-                                    options=['Low', 'Medium', 'High'])    
+            self.optimal_capital_structure = st.number_input(label='Specify the Target Optimal Capital Structure (%):')   
         # create inputs in the first column in the second tier
         with self.c1_b:
             self.risk_free_rate = st.number_input(label='Specify the Risk-Free Rate:')
@@ -109,7 +108,7 @@ class UserInputs:
         # store User Inputs in a dictionary
         self.inputs = {
             'business_risk_analysis': self.business_risk.lower(),
-            'financial_risk_analysis': self.financial_risk.lower(),
+            'target_optimal_capital_structure': self.optimal_capital_structure,
             'risk_free_rate': self.risk_free_rate, 
             'bond_spread': self.bond_spread,
             'tax_rate': self.tax_rate, 

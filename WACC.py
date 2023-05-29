@@ -24,7 +24,7 @@ class WeightedAvgCostCapital:
 
         # alter inputs
         self.business_risk = inputs['business_risk_analysis'].lower()
-        self.financial_risk = inputs['financial_risk_analysis'].lower()
+        self.target_optimal_capital_structure = int(inputs['target_optimal_capital_structure'])
 
         # store other inputs
         self.risk_free_rate = inputs['risk_free_rate']
@@ -48,11 +48,71 @@ class WeightedAvgCostCapital:
             'high': 0.039
         }
 
+        
+
+        # todo: nested dictionary of business risk and optimal capital structure 
+
         # functions to compute WACC
         self.compute_equity_risk_premium()
         self.compute_cost_of_equity()
         self.compute_after_tax_cost_of_debt()
         self.compute_wacc()
+
+    def compute_high_business_risk(self):
+        """
+        Computes the Financial Risk of a company deemed to have High Business Risk.
+
+        Args:
+            None
+        
+        Returns: 
+            An Equity Risk Premium value
+        
+        """
+        if self.target_optimal_capital_structure < 10: 
+            return 0.064
+        elif self.target_optimal_capital_structure > 29: 
+            return 0.09
+        else:
+            return 0.075
+
+
+    def compute_medium_business_risk(self):
+        """
+        Computes the Financial Risk of a company deemed to have Medium Business Risk.
+
+        Args:
+            None
+        
+        Returns: 
+            An Equity Risk Premium value
+        
+        """
+        if self.target_optimal_capital_structure < 30: 
+            return 0.04
+        elif self.target_optimal_capital_structure > 49: 
+            return 0.061
+        else:
+            return 0.05
+        
+    def compute_low_business_risk(self):
+        """
+        Computes the Financial Risk of a company deemed to have Low Business Risk.
+
+        Args:
+            None
+        
+        Returns: 
+            An Equity Risk Premium value
+        
+        """
+        if self.target_optimal_capital_structure < 50: 
+            return 0.02
+        elif self.target_optimal_capital_structure > 70: 
+            return 0.039
+        else:
+            return 0.03
+
 
     def compute_equity_risk_premium(self):
         """
@@ -64,12 +124,13 @@ class WeightedAvgCostCapital:
         Returns:
             An ERP value according to the inputted Business and Financial Risk
         """
+        # needs an update
         if self.business_risk == 'high':
-            self.erp = self.high_business_risk[self.financial_risk]
+            self.erp = self.compute_high_business_risk()
         elif self.business_risk == 'medium':
-            self.erp = self.med_business_risk[self.financial_risk]
+            self.erp = self.compute_medium_business_risk()
         else:
-            self.erp = self.low_business_risk[self.financial_risk]
+            self.erp = self.compute_low_business_risk()
 
     def compute_cost_of_equity(self): 
         """
