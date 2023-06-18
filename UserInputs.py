@@ -66,7 +66,7 @@ class UserInputs:
         with self.c2_a:
             self.yrs = st.slider(label='Specify the number of years:',
                             min_value=1,
-                            max_value=10)
+                            max_value=5)
             self.optimal_capital_structure = st.number_input(label='Specify the Target Optimal Capital Structure (%):')   
         # create inputs in the first column in the second tier
         with self.c1_b:
